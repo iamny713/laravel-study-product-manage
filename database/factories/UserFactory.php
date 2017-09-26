@@ -2,7 +2,7 @@
 
 use Faker\Generator as Faker;
 use NohYooHan\Domain\Product\Product;
-use App\Domain\User\User;
+use NohYooHan\Domain\User\User;
 
 /*
 |--------------------------------------------------------------------------
