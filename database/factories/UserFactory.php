@@ -1,6 +1,8 @@
 <?php
 
 use Faker\Generator as Faker;
+use NohYooHan\Domain\Product\Product;
+use App\Domain\User\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +15,7 @@ use Faker\Generator as Faker;
 |
 */
 
-$factory->define(App\User::class, function (Faker $faker) {
+$factory->define(User::class, function (Faker $faker) {
     static $password;
 
     return [
@@ -21,5 +23,14 @@ $factory->define(App\User::class, function (Faker $faker) {
         'email' => $faker->unique()->safeEmail,
         'password' => $password ?: $password = bcrypt('secret'),
         'remember_token' => str_random(10),
+    ];
+});
+
+$factory->define(Product::class, function (Faker $faker) {
+    return [
+        'name' => $faker->name,
+        'description' => $faker->sentence,
+        'price' => mt_rand(1000, 10000),
+        'stock' => mt_rand(10, 100),
     ];
 });

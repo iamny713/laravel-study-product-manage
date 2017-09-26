@@ -19,3 +19,10 @@ Route::middleware(AuthenticateOnceWithBasicAuth::class)->get('/user', function (
         'foo' => 'bar',
     ];
 });
+
+Route::middleware(AuthenticateOnceWithBasicAuth::class)->group(function () {
+    Route::post('products', 'ProductController@createProduct');
+    Route::get('products', 'ProductController@listProduct');
+    Route::put('products/{product}', 'ProductController@updateProduct');
+    Route::delete('products/{product}', 'ProductController@deleteProduct');
+});
