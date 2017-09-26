@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthenticateOnceWithBasicAuth;
 use Illuminate\Http\Request;
 
 /*
@@ -13,6 +14,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(AuthenticateOnceWithBasicAuth::class)->get('/user', function (Request $request) {
+    return [
+        'foo' => 'bar',
+    ];
 });
