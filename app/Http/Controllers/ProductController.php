@@ -10,18 +10,21 @@ use NohYooHan\Domain\Product\Product;
 use Exception;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
+use NohYooHan\Service\Product\ProductCreator;
+use NohYooHan\Service\Product\ProductModifier;
+use NohYooHan\Service\Product\ProductRetriever;
 use Response;
 
 class ProductController extends Controller
 {
-    public function createProduct(CreateProductRequest $request)
-    {
+    public function createProduct(
+        CreateProductRequest $request,
+        ProductCreator $productCreator
+    ) {
         DB::beginTransaction();
 
         try {
-            /** @var Product $product */
-            $product = new Product;
-            $this->makeProduct($product, $request);
+            $product = $productCreator->makeProduct($request->getProductDto());
             $product->save();
 
             DB::commit();
@@ -33,45 +36,19 @@ class ProductController extends Controller
         return $product;
     }
 
-    public function listProduct(ListProductRequest $request)
+    public function listProduct(ListProductRequest $request, ProductRetriever $productRetriever)
     {
-        $dto = $request->getProductSearchParam();
-
-        $builder = Product::query();
-
-        if ($dto->getSearch()) {
-            $builder->where(function (Builder $builder) use ($dto) {
-                $builder->where('name', 'like', "%{$dto->getSearch()}%")
-                    ->orWhere('description', 'like', "%{$dto->getSearch()}%");
-            });
-        }
-
-        if ($dto->getPriceFrom() && $dto->getPriceTo()) {
-            $builder->whereBetween('price', [
-                $dto->getPriceFrom(),
-                $dto->getPriceTo()
-            ]);
-        }
-
-        if ($dto->getPriceFrom() && ! $dto->getPriceTo()) {
-            $builder->where('price', '>=', $dto->getPriceFrom());
-        }
-
-        if (! $dto->getPriceFrom() && $dto->getPriceTo()) {
-            $builder->where('price', '<=', $dto->getPriceTo());
-        }
-
-        return $builder->paginate($dto->getSize(), ['*'], 'page', $page = $dto->getPage());
+        return $productRetriever->retrieveBySearchParam($request->getProductSearchParam());
     }
 
-    public function updateProduct(UpdateProductRequest $request, int $productId)
+    public function updateProduct(UpdateProductRequest $request, int $productId, ProductModifier $productModifier)
     {
         DB::beginTransaction();
 
         try {
             /** @var Product $product */
             $product = Product::findOrFail($productId);
-            $this->modifyProduct($product, $request);
+            $productModifier->modifyProduct($product, $request->getProductDto());
             $product->save();
 
             DB::commit();
@@ -98,21 +75,5 @@ class ProductController extends Controller
         }
 
         return Response::json([], 204);
-    }
-
-    private function makeProduct(Product $product, CreateProductRequest $request)
-    {
-        $product->name = $request->getName();
-        $product->description = $request->getDescription();
-        $product->price = $request->getPrice();
-        $product->stock = $request->getStock();
-    }
-
-    private function modifyProduct(Product $product, UpdateProductRequest $request)
-    {
-        $product->name = $request->getName();
-        $product->description = $request->getDescription() ?: $product->description;
-        $product->price = $request->getPrice();
-        $product->stock = $request->getStock();
     }
 }

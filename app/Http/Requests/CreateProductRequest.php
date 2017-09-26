@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use NohYooHan\Domain\Common\Dto\ProductDto;
+
 class CreateProductRequest extends BaseRequest
 {
     public function rules()
@@ -14,23 +16,13 @@ class CreateProductRequest extends BaseRequest
         ];
     }
 
-    public function getName()
+    public function getProductDto()
     {
-        return $this->get('name');
-    }
-
-    public function getPrice()
-    {
-        return $this->get('price');
-    }
-
-    public function getStock()
-    {
-        return $this->get('stock');
-    }
-
-    public function getDescription()
-    {
-        return $this->get('description');
+        return new ProductDto(
+            $this->get('name'),
+            $this->get('description'),
+            $this->get('price'),
+            $this->get('stock')
+        );
     }
 }
