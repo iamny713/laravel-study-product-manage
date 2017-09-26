@@ -4,6 +4,7 @@ namespace NohYooHan\Domain\Product;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use NohYooHan\Domain\Review\Review;
 
 /**
  * Class Product
@@ -17,5 +18,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Product extends Model
 {
-    //
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

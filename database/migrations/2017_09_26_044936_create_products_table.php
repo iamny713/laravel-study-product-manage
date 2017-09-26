@@ -10,8 +10,8 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->text('description');
+            $table->string('name')->comment('제품 이름');
+            $table->text('description')->comment('제품 설명');
             $table->unsignedInteger('price');
             $table->unsignedInteger('stock');
             $table->timestamps();
