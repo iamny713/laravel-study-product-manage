@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProductCreatedEvent;
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\DeleteProductRequest;
 use App\Http\Requests\ListProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Transformers\ProductTransformer;
 use DB;
 use Exception;
-use NohYooHan\Domain\Product\Product;
+use Illuminate\Contracts\Events\Dispatcher;
 use NohYooHan\Service\Product\ProductCreator;
 use NohYooHan\Service\Product\ProductModifier;
 use NohYooHan\Service\Product\ProductRetriever;
@@ -18,7 +20,8 @@ class ProductController extends Controller
 {
     public function createProduct(
         CreateProductRequest $request,
-        ProductCreator $productCreator
+        ProductCreator $productCreator,
+        Dispatcher $eventDispatcher
     ) {
         DB::beginTransaction();
 
@@ -32,21 +35,39 @@ class ProductController extends Controller
             throw $e;
         }
 
+        $eventDispatcher->dispatch(new ProductCreatedEvent($product));
+
         return $product;
     }
 
     public function listProduct(ListProductRequest $request, ProductRetriever $productRetriever)
     {
-        return $productRetriever->retrieveBySearchParam($request->getProductSearchParam());
+        $paginator = $productRetriever->retrieveBySearchParam($request->getProductSearchParam());
+
+        return json()->setMeta([
+            'foo' => 'bar'
+        ])->withPagination($paginator, new ProductTransformer);
     }
 
-    public function updateProduct(UpdateProductRequest $request, int $productId, ProductModifier $productModifier)
+    public function getProduct(ListProductRequest $request, ProductRetriever $productRetriever, int $productId)
     {
+        $product = $productRetriever->retrieveById($productId);
+
+        return json()->setMeta([
+            'foo' => 'bar'
+        ])->withItem($product, new ProductTransformer);
+    }
+
+    public function updateProduct(
+        UpdateProductRequest $request,
+        ProductRetriever $productRetriever,
+        ProductModifier $productModifier,
+        int $productId
+    ) {
         DB::beginTransaction();
 
         try {
-            /** @var Product $product */
-            $product = Product::findOrFail($productId);
+            $product = $productRetriever->retrieveById($productId);
             $productModifier->modifyProduct($product, $request->getProductDto());
             $product->save();
 
@@ -59,13 +80,15 @@ class ProductController extends Controller
         return $product;
     }
 
-    public function deleteProduct(DeleteProductRequest $request, int $productId)
-    {
+    public function deleteProduct(
+        DeleteProductRequest $request,
+        ProductRetriever $productRetriever,
+        int $productId
+    ) {
         DB::beginTransaction();
 
         try {
-            /** @var Product $product */
-            $product = Product::findOrFail($productId);
+            $product = $productRetriever->retrieveById($productId);
             $product->delete();
             DB::commit();
         } catch (Exception $e) {

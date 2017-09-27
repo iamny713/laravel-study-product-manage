@@ -1,6 +1,7 @@
 <?php
 
 use Faker\Generator as Faker;
+use NohYooHan\Domain\Product\Category;
 use NohYooHan\Domain\Product\Product;
 use NohYooHan\Domain\User\User;
 
@@ -30,6 +31,7 @@ $factory->define(Product::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
         'description' => $faker->sentence,
+        'category' => Category::FOOD,
         'price' => mt_rand(1000, 10000),
         'stock' => mt_rand(10, 100),
     ];

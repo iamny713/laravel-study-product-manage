@@ -9,10 +9,12 @@ use NohYooHan\Domain\Review\Review;
 /**
  * Class Product
  * @package App
+ * @property int $id
  * @property string $name
  * @property string $description
  * @property int $price
  * @property int $stock
+ * @property Category $category
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */

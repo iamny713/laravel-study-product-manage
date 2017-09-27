@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use NohYooHan\Domain\Common\Dto\ProductDto;
+use NohYooHan\Domain\Product\Category;
 
 class CreateProductRequest extends BaseRequest
 {
@@ -13,6 +14,7 @@ class CreateProductRequest extends BaseRequest
             'description' => 'required',
             'price' => ['required', 'integer'],
             'stock' => ['required', 'integer'],
+            'category' => ['required', 'in:FOOD,COMMODITY'],
         ];
     }
 
@@ -22,7 +24,8 @@ class CreateProductRequest extends BaseRequest
             $this->get('name'),
             $this->get('description'),
             $this->get('price'),
-            $this->get('stock')
+            $this->get('stock'),
+            Category::getInstance($this->get('category', Category::FOOD))
         );
     }
 }

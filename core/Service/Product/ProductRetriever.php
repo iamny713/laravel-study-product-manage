@@ -8,6 +8,11 @@ use NohYooHan\Domain\Product\Product;
 
 class ProductRetriever
 {
+    public function retrieveAll()
+    {
+        return Product::all();
+    }
+
     public function retrieveBySearchParam(ProductSearchParam $dto)
     {
         $builder = Product::query();
@@ -35,5 +40,10 @@ class ProductRetriever
         }
 
         return $builder->paginate($dto->getSize(), ['*'], 'page', $page = $dto->getPage());
+    }
+
+    public function retrieveById(int $productId)
+    {
+        return Product::findOrFail($productId);
     }
 }

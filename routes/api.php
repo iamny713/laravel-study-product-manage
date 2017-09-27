@@ -22,9 +22,10 @@ Route::middleware(AuthenticateOnceWithBasicAuth::class)->get('/user', function (
 
 Route::middleware(AuthenticateOnceWithBasicAuth::class)->group(function () {
     Route::post('products', 'ProductController@createProduct');
+    Route::get('products/{productId}', 'ProductController@getProduct');
     Route::get('products', 'ProductController@listProduct');
-    Route::put('products/{product}', 'ProductController@updateProduct');
-    Route::delete('products/{product}', 'ProductController@deleteProduct');
+    Route::put('products/{productId}', 'ProductController@updateProduct');
+    Route::delete('products/{productId}', 'ProductController@deleteProduct');
 
     Route::post('products/{product}/reviews', 'ReviewController@createReview');
     Route::put('reviews/{review}', 'ReviewController@updateReview');

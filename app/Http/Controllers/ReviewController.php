@@ -67,8 +67,10 @@ class ReviewController extends Controller
         return $reviewRetriever->retrieveByProductId($productId, $request->getReviewSearchParam());
     }
 
-    public function deleteReview(DeleteReviewRequest $request, int $reviewId)
-    {
+    public function deleteReview(
+        DeleteReviewRequest $request,
+        int $reviewId
+    ) {
         DB::beginTransaction();
 
         try {

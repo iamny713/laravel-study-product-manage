@@ -9,12 +9,12 @@ class ProductCreator
 {
     public function makeProduct(ProductDto $dto)
     {
-        /** @var Product $product */
         $product = new Product;
         $product->name = $dto->getName();
         $product->description = $dto->getDescription();
         $product->price = $dto->getPrice();
-        $product->stock = $dto->getStock();
+        $product->stock = $dto->getStock();;
+        $product->category = $dto->getCategory();
 
         return $product;
     }
