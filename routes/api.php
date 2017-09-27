@@ -25,4 +25,9 @@ Route::middleware(AuthenticateOnceWithBasicAuth::class)->group(function () {
     Route::get('products', 'ProductController@listProduct');
     Route::put('products/{product}', 'ProductController@updateProduct');
     Route::delete('products/{product}', 'ProductController@deleteProduct');
+
+    Route::post('products/{product}/reviews', 'ReviewController@createReview');
+    Route::put('reviews/{review}', 'ReviewController@updateReview');
+    Route::get('products/{productId}/reviews', 'ReviewController@listReviewByProductId');
+    Route::delete('reviews/{review}', 'ReviewController@deleteReview');
 });
