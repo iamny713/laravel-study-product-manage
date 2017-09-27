@@ -7,10 +7,12 @@ use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\DeleteProductRequest;
 use App\Http\Requests\ListProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Jobs\UpdateProductNameJob;
 use App\Transformers\ProductTransformer;
 use DB;
 use Exception;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Bus\Dispatcher as JobDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use NohYooHan\Service\Product\ProductCreator;
 use NohYooHan\Service\Product\ProductModifier;
 use NohYooHan\Service\Product\ProductRetriever;
@@ -21,7 +23,7 @@ class ProductController extends Controller
     public function createProduct(
         CreateProductRequest $request,
         ProductCreator $productCreator,
-        Dispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher
     ) {
         DB::beginTransaction();
 
@@ -97,5 +99,18 @@ class ProductController extends Controller
         }
 
         return Response::json([], 204);
+    }
+
+    public function updateProductName(
+        ProductRetriever $productRetriever,
+        JobDispatcher $jobDispatcher,
+        int $productId
+    ) {
+        $product = $productRetriever->retrieveById($productId);
+        $jobDispatcher->dispatch(new UpdateProductNameJob($product));
+
+        return json([
+            'status' => 'success'
+        ]);
     }
 }
